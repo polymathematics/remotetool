@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>replit</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+
+</head>
+
+<body onload="googleCalendarInput()">
+ <h1>Remote Time Blocking Tool</h1>
+  <h3>Track your time and objectives in twenty minute sprints.</h3>
+  <div id="app"></div>
+  <br>
+  <button class="startTimer__btn" onclick="startTimer()">Start Sprint</button> 
+ 
+  
+  <div class = "tasks">
+    <h3> Tasks in this Sprint</h3>
+    <form>
+    <input type="text" placeholder="task one" id="sprintTaskOne" value=""></input>
+    <input type="text" placeholder="task two"></input>
+    <input type="text" placeholder="task three"></input>
+      <input type="text" placeholder="task four"></input>
+    <button type="button" class="saveSprintTasks" onclick="saveSprintTasks__btn()">Save tasks</button>
+    </form>
+    
+    <h3>Tasks for Today</h3>
+    <form>
+      <input type="text" placeholder="task one"></input>
+    <input type="text" placeholder="task two"></input>
+    <input type="text" placeholder="task three"></input>
+      <input type="text" placeholder="task four"></input>
+    <button class="saveDailyTasks" onclick="saveDailyTasks__btn()">Save tasks</button>
+    </form>
+  </div>
+  <div class = "time__block">
+    <h3>Time Blocking</h3>
+   
+  <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=2&bgcolor=%230B8043&ctz=America%2FChicago&mode=WEEK&showPrint=0&showTabs=1&showCalendars=1&showTitle=0&src=amFjb2J3ZWJlcjUzMEBnbWFpbC5jb20&src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%237986CB&color=%237986CB" style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+  <br>
+    <!-- I am trying to let user link their calendar themself, save the link as a variable, and then add that variable / link as the src for the iframe. Issue is that I can't validate that is happening, and refreshing resets the variable 
+  <iframe id="googleCal" src=></iframe>
+  <br> -->
+  <div class="timeblocking">
+   <!-- <button type="button" class="timeblock__btn" onclick="shareTime()"> Add time block </button> -->
+  <input type=button class="timeblock__btn" onClick="parent.open('https://calendar.google.com/calendar/u/0/r?cid=jacobweber530@gmail.com&cid=en.usa%23holiday@group.v.calendar.google.com')" 
+value='Add time block'>
+  </div>
+  <br>
+  <div class="share__btn">
+    <button type="button" class="share__btn" onclick="shareTeam()"> Share with Team </button>
+    <!-- When user clicks button: ask for emails, and email link to page. This will require storing user inputs
+    --> 
+  </div>
+  <!-- <script src="js/timer.js"></script> -->
+  <script>
+function shareTime() {
+  var x;
+  
+  var startTime=prompt("What time does your next block start?","1:00");
+  var howLong=prompt("How many hours should this block be?", "1")
+  var blockName=prompt("What would you like to call this block?", "Client Call")
+  console.log(startTime, howLong, blockName)
+}
+function shareTeam() {
+  var teamEmail=prompt("Who would you like to share this with?", "email@domain.com")
+  console.log(teamEmail)
+}
+const FULL_DASH_ARRAY = 283;
+const WARNING_THRESHOLD = 10;
+const ALERT_THRESHOLD = 5;
+
+const COLOR_CODES = {
+  info: {
+    color: "green"
+  },
+  warning: {
+    color: "orange",
+    threshold: WARNING_THRESHOLD
+  },
+  alert: {
+    color: "red",
+    threshold: ALERT_THRESHOLD
+  }
+};
+
+const TIME_LIMIT = 1200;
+let timePassed = 0;
+let timeLeft = TIME_LIMIT;
+let timerInterval = null;
+let remainingPathColor = COLOR_CODES.info.color;
+
+document.getElementById("app").innerHTML = `
+<div class="base-timer">
+  <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <g class="base-timer__circle">
+      <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+      <path
+        id="base-timer-path-remaining"
+        stroke-dasharray="283"
+        class="base-timer__path-remaining ${remainingPathColor}"
+        d="
+          M 50, 50
+          m -45, 0
+          a 45,45 0 1,0 90,0
+          a 45,45 0 1,0 -90,0
+        "
+      ></path>
+    </g>
+  </svg>
+  <span id="base-timer-label" class="base-timer__label">${formatTime(
+    timeLeft
+  )}</span>
+</div>
+`;
+
+
+
+function onTimesUp() {
+  clearInterval(timerInterval);
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timePassed = timePassed += 1;
+    timeLeft = TIME_LIMIT - timePassed;
+    document.getElementById("base-timer-label").innerHTML = formatTime(
+      timeLeft
+    );
+    setCircleDasharray();
+    setRemainingPathColor(timeLeft);
+
+    if (timeLeft === 0) {
+      onTimesUp();
+    }
+  }, 1000);
+}
+
+function formatTime(time) {
+  const minutes = Math.floor(time / 60);
+  let seconds = time % 60;
+
+  if (seconds < 10) {
+    seconds = `0${seconds}`;
+  }
+
+  return `${minutes}:${seconds}`;
+}
+
+function setRemainingPathColor(timeLeft) {
+  const { alert, warning, info } = COLOR_CODES;
+  if (timeLeft <= alert.threshold) {
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.remove(warning.color);
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.add(alert.color);
+  } 
+  else if (timeLeft <= warning.threshold) {
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.remove(info.color);
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.add(warning.color);
+  }
+}
+
+function calculateTimeFraction() {
+  const rawTimeFraction = timeLeft / TIME_LIMIT;
+  return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
+}
+
+function setCircleDasharray() {
+  const circleDasharray = `${(
+    calculateTimeFraction() * FULL_DASH_ARRAY
+  ).toFixed(0)} 283`;
+  document
+    .getElementById("base-timer-path-remaining")
+    .setAttribute("stroke-dasharray", circleDasharray);
+}
+
+function saveSprintTasks__btn() {
+  const sprintTaskOne = document.getElementById("sprintTaskOne");
+}
+
+function saveDailyTasks__btn() {
+}
+/* this function is called onload in the body up top, idea here is to check if we have the user's iFrame for Google cal, and if not request it on page load. Don't want to go the user page route with a bunch of fields for personal info    
+/* function googleCalendarInput() {
+  let iFrameInput = "hello";
+  console.log(iFrameInput);
+  
+  if (iFrameInput = "hello") {
+    iFrameInput=prompt("Link your Google Calendar here")
+  document.getElementById("googleCal").innerHTML = "<iFrame src='"+ iFrameInput + "'>";
+    console.log(iFrameInput);
+}
+  else {
+    iFrameInput = "bye";
+    console.log(iFrameInput);
+  }
+} */
+
+
+
+</script>
+
+</body>
+
+</html>
